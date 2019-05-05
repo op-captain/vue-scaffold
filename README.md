@@ -57,7 +57,13 @@ See [Configuration Reference](https://cli.vuejs.org/config/).
   1. 将第三方UI组件库 按需引入组件 cubeUi.js 
   2. 存放自定义的全局组件 使用 components/global/main.js 自动化方式载入
 
-- 路由页面 views
+- 路由对应的渲染组件 views
+
+- 路由配置 router
+
+    根据不同的业务模块进行拆分路由
+
+    1. deputyInformation 代表信息
 
 
 

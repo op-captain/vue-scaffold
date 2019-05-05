@@ -3,7 +3,7 @@
     <h1>{{ msg }}</h1>
     <cube-button @click="showDialog">show dialog</cube-button>
     <cube-loading v-if="loading"></cube-loading>
-    <bottomTabNavigator></bottomTabNavigator>
+    <BottomTabNavigator></BottomTabNavigator>
     <p>
       For a guide and recipes on how to configure / customize this project,<br>
       check out the
