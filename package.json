@@ -3,11 +3,15 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "serve": "vue-cli-service serve",
+    "dev": "vue-cli-service serve --mode dev",
+    "local": "vue-cli-service serve --mode local", 
+    "test": "vue-cli-service serve --mode test", 
+    "prod": "vue-cli-service serve --mode production", 
     "build": "vue-cli-service build"
   },
   "dependencies": {
     "amfe-flexible": "^2.2.1",
+    "axios": "^0.18.0",
     "core-js": "^2.6.5",
     "cube-ui": "~1.12.15",
     "lodash": "^4.17.11",
