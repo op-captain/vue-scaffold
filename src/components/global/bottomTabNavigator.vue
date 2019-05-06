@@ -6,8 +6,18 @@
 </template>
 
 <script>
+import {mapActions} from 'vuex'
+
 //底部导般
 export default {
+    mounted:function(){
+        this.TOKEN({username:'zj',password:'123'}).then(()=>{
+            console.log(this.$store.state.TOKEN)
+        })
+    },
+    methods:{
+        ...mapActions(['TOKEN'])
+    },
     data:function(){
         return {
             BASE_URL:process.env.BASE_URL,

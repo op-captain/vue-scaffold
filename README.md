@@ -7,7 +7,7 @@ npm install
 
 ### Compiles and hot-reloads for development
 ```
-npm run serve
+npm run dev
 ```
 
 ### Compiles and minifies for production
@@ -33,6 +33,16 @@ See [Configuration Reference](https://cli.vuejs.org/config/).
 <hr>
 
 # people-app 开发相关说明
+
+### npm
+
+npm run local 调用的是：.env.local配置; 开发环境
+
+npm run dev 调用的是：.env.dev配置; 开发环境
+
+npm run test 调用的是：.env.test配置; 测试环境
+
+npm run prod 调用的是：.env.production配置; 生产环境
 
 ### 工具和插件
 
@@ -67,26 +77,26 @@ See [Configuration Reference](https://cli.vuejs.org/config/).
 
     1. deputyInformation 代表信息
 
+- 插件或工具方法 utils
+
+- 状态管理 store
+
 ### 配置
 
 - 环境变量
   
   cli-3.0总共提供了四种方式来制定环境变量：
-
-    1. 在根目录添加.env文件，配置所有情况下都会用到的配置（不知道这个存在的意义，所有的都需要的也就不需要配置了 吧）。
-    2. 在根目录添加.env.local 文件，配置所有情况下都会用到的配置，与.env的区别是只会在本地，该文件不会被git跟踪。
-    3. 在根目录添加.env.[mode] 文件，配置对应某个模式下的配置,比如：.env.development来配置开发环境的配置。
-    4. 在根目录添加.env.[mode].local文件，配置对应某个模式下的配置,与.env.[mode]的区别也只是会在本地生效，该文件不会被git跟踪。
+  https://www.cnblogs.com/heroljy/p/9305263.html
 
 - 打包构建时的配置
 
-    .env ,  开发
+    .env.dev ,  开发
 
-    .env.prod , 生产
+    .env.production , 生产
 
     .env.test 测试
 
-    .env.local 本地，不要提交
+    .env.local 本地开发，不要提交代码托管服务器（SVN 或 git）
 
 - axios
 
