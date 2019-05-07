@@ -20,8 +20,8 @@ export default {
     },
     data:function(){
         return {
-            BASE_URL:process.env.BASE_URL,
-            IMG_URL:process.env.IMG_URL,
+            BASE_URL:process.env.API_BASE_URL,
+            IMG_URL:process.env.AJAX_TIMEOUT,
 
         }
     }

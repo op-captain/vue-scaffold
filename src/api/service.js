@@ -8,7 +8,7 @@ import { Dialog } from 'cube-ui'
 const service = axios.create({
     // 设置超时时间
     timeout: process.env.AJAX_TIMEOUT,
-    baseURL: "https://easy-mock.com"
+    baseURL: process.env.API_BASE_URL
 })
 
 service.defaults.headers.post['Content-Type'] = 'application/json;charset=UTF-8'
