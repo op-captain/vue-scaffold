@@ -36,7 +36,7 @@ See [Configuration Reference](https://cli.vuejs.org/config/).
 
 ### npm
 
-npm run local 调用的是：.env.local配置; 开发环境
+npm run local 调用的是：.env.local配置; 开发环境（本机）
 
 npm run dev 调用的是：.env.dev配置; 开发环境
 
@@ -80,15 +80,32 @@ npm run prod 调用的是：.env.production配置; 生产环境
 - 插件或工具方法 utils
 
 - 状态管理 store
+  
+- 混入的统一管理 mixins
+  
+  pageList： 翻页功能的列表
+
+- 静态资源 assets
+
+    图片，icon, css ,字体文件
+
+### 重要文件
+
+- assets/common.css 共用样式
+- App.vue   入口页面
+- main.js   入口js
+- /router/index.js 路由的入口配置
 
 ### 配置
 
-- 环境变量
-  
+- 环境变量 .env
+
   cli-3.0总共提供了四种方式来制定环境变量：
   https://www.cnblogs.com/heroljy/p/9305263.html
 
 - 打包构建时的配置
+
+    全局的配置，都要放到.env文件中。根据不同的环境修改里面的配置
 
     .env.dev ,  开发
 

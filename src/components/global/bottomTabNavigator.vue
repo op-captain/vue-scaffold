@@ -1,6 +1,6 @@
 <template>
 <div>
-    <P>{{BASE_URL}}</p>
+    <P><i class="cubeic-alert"></i>{{BASE_URL}}</p>
     <P>{{IMG_URL}}</p>
 </div>
 </template>
@@ -11,12 +11,10 @@ import {mapActions} from 'vuex'
 //底部导般
 export default {
     mounted:function(){
-        this.TOKEN({username:'zj',password:'123'}).then(()=>{
-            console.log(this.$store.state.TOKEN)
-        })
+
     },
     methods:{
-        ...mapActions(['TOKEN'])
+        
     },
     data:function(){
         return {

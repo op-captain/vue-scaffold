@@ -2,7 +2,7 @@
 import service from './service'
 
 const url = {
-    login:'mock/5ccfcac38da80f6f5c2a798a/example/login'
+    login:'/login'
 }
 
 
