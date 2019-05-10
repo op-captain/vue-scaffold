@@ -79,6 +79,8 @@ npm run prod 调用的是：.env.production配置; 生产环境
 
 - 插件或工具方法 utils
 
+    localStorage.js ： localStorage的有效期封装
+
 - 状态管理 store
   
 - 混入的统一管理 mixins

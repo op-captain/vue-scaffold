@@ -3,34 +3,36 @@ import Router from 'vue-router'
 import storage from '@/utils/localStorage'
 import api from '@/api/index'
 
-Vue.use(Router)
+
+
+//实例router
+let VueRouter
 
 let routes = []
 
-// 获取组件目录下符合 一定 正则表达式的 组件
-const routersContext = require.context('./', true, /.js$/)
+//处理路由
+function formRouter() {
 
-// 获取上下文下的 所有组件
-const routersArray = routersContext.keys()
+    // 获取组件目录下符合 一定 正则表达式的 组件
+    const routersContext = require.context('./', true, /.js$/)
 
-//合并各模块的路由
-routersArray.forEach((route, index) => {
-    if (route.startsWith('./index')) {
-        return
-    }
+    // 获取上下文下的 所有组件
+    const routersArray = routersContext.keys()
 
-    const routerModule = routersContext(route)
+    //合并各模块的路由
+    routersArray.forEach((route, index) => {
+        if (route.startsWith('./index')) {
+            return
+        }
 
-    routes = [...routes, ...(routerModule.default || routerModule)]
-})
+        const routerModule = routersContext(route)
 
-//实例router
-const VueRouter = new Router({
-    routes
-})
+        routes = [...routes, ...(routerModule.default || routerModule)]
+    })
+}
 
-//拦截路由
-VueRouter.beforeEach(function (to, from, next) {
+//登录处理
+function loginVilable(to, from, next) {
     let storeState = VueRouter.app.$options.store.state,
         token = storage.getLocalStorage('token');
 
@@ -38,7 +40,7 @@ VueRouter.beforeEach(function (to, from, next) {
         next()
     } else {
         //已验证登录成功
-        if (storeState.auth.login) {
+        if (storeState.auth.login && token) {
             next()
         } else {
             /**
@@ -46,27 +48,54 @@ VueRouter.beforeEach(function (to, from, next) {
              */
 
             //没有成功登录
-            if(!token){
+            if (!token) {
                 next({
                     path: '/login',
                     query: { redirect: to.fullPath }//把要跳转的地址作为参数传到下一步
-                  })
-            }else{
+                })
+            } else {
                 //验证token
-                ()=>{
+                () => {
                     //……
                 }
 
                 //调用后台登录接口 实现自动登录
-                VueRouter.app.$options.store.dispatch('Login',{username:"zz",password:"123"}).then((data)=>{
+                VueRouter.app.$options.store.dispatch('Login', { username: "zz", password: "123" }).then((data) => {
                     next()
                     console.log(data)
                 })
             }
         }
     }
+}
+
+//页面标题处理
+function documentTitle(to, from, next) {
+    /* 路由发生变化修改页面title */
+    if (to.meta.title) {
+        document.title = to.meta.title
+    }
+    next()
+}
+
+Vue.use(Router)
+
+formRouter()
 
 
+//实例router
+VueRouter = new Router({
+    routes
+})
+
+//拦截路由
+VueRouter.beforeEach(function (to, from, next) {
+
+    //登录处理
+    loginVilable(to, from, next)
+
+    //页面标题处理
+    documentTitle(to, from, next)
 })
 
 export default VueRouter

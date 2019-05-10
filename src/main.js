@@ -9,8 +9,10 @@ import store from './store/index'
 import 'amfe-flexible'
 //全局组件
 import './components/global'
-//
-import './assets/common.css'
+//全局样式
+import './assets/common.less'
+//全局指令
+import './directive'
 
 
 Vue.config.productionTip = false

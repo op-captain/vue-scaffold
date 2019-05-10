@@ -4,6 +4,9 @@ export default [
     {
         path:'/login',
         name:'login',
-        component:Login
+        component:Login,
+        meta:{
+            title:'登录'
+        }
     }
 ]
