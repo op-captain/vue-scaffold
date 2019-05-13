@@ -72,8 +72,9 @@ function loginVilable(to, from, next) {
 //页面标题处理
 function documentTitle(to, from, next) {
     /* 路由发生变化修改页面title */
-    if (to.meta.title) {
-        document.title = to.meta.title
+    let title = to.params.meta && to.params.meta.title || to.meta.title;
+    if (title) {
+        document.title = title
     }
     next()
 }

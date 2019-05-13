@@ -94,9 +94,16 @@ npm run prod 调用的是：.env.production配置; 生产环境
 ### 重要文件
 
 - assets/common.css 共用样式
+  
+    cube-ui 提供了清浮动、一像素边框新式 参看：https://didi.github.io/cube-ui/#/zh-CN/docs/style
+
 - App.vue   入口页面
 - main.js   入口js
 - /router/index.js 路由的入口配置
+
+### 公用样式
+
+
 
 ### 配置
 

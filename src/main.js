@@ -12,7 +12,7 @@ import './components/global'
 //全局样式
 import './assets/common.less'
 //全局指令
-import './directive'
+import './directive/index'
 
 
 Vue.config.productionTip = false

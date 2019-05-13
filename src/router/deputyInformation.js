@@ -10,6 +10,9 @@ export default [
     {
         path:'/list',
         name:'list',
-        component:List
+        component:List,
+        meta:{
+            title:'列表页'
+        }
     }
 ]
