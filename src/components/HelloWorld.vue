@@ -3,7 +3,7 @@
     <h1>{{ msg }}</h1>
     <cube-button @click="showDialog">show dialog</cube-button>
     <cube-loading v-if="loading"></cube-loading>
-    <BottomTabNavigator></BottomTabNavigator>
+    <bottom-tab-navigator></bottom-tab-navigator>
     
   </div>
 </template>

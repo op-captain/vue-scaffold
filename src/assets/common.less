@@ -35,8 +35,9 @@
 
 /*swiper 预览图样式*/
 #origin-img {
-    display: none;
+    display: block;
     position: fixed;
+    z-index: 9999;
     top: 0;
     left: 0;
     width: 100%;
@@ -49,19 +50,22 @@
     vertical-align: middle;
 }
 
-.swiper-pagination {
-    top: 1em;
+#origin-img .swiper-pagination {
+    font-size: 0.3243rem;
+    top: 0.4324rem;
     bottom: auto;
     color: #fff;
 }
 
-.img-info {
+#origin-img .img-info {
     position: absolute;
-    bottom: 0;
-    line-height: 3em;
+    font-size: 0.3784rem;
+    bottom: 0.2703rem;
+    line-height: 0.3243rem;
     background: rgba(0, 0, 0, .5);
-    z-index: 5;
+    z-index: 1;
     color: #fff;
-    text-indent: 1em;
+    text-indent: 0.3243rem;
     width: 100%;
 }
+
