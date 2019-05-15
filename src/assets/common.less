@@ -1,9 +1,30 @@
-@navColor: red;
+@navColor: #fff;
+@fs14: 14px;
+@fs12: 12px;
 
+
+html,
+body {
+    height: 100%;
+}
+/*iscroll的列表滑动需要 高度100%*/
+#app {
+    font-size: @fs14;
+    height: 100%;
+}
 
 /* 导航 */
-#nav a.router-link-exact-active {
-    color: @navColor
+#nav{
+    
+}
+
+#nav  {
+    background: red;
+    color: #fff;
+    a.router-link-exact-active{
+        color: @navColor
+    }
+    
 }
 
 /*九宫格图片*/
@@ -51,7 +72,7 @@
 }
 
 #origin-img .swiper-pagination {
-    font-size: 0.3243rem;
+    font-size: @fs12;
     top: 0.4324rem;
     bottom: auto;
     color: #fff;
@@ -59,13 +80,12 @@
 
 #origin-img .img-info {
     position: absolute;
-    font-size: 0.3784rem;
+    font-size: @fs14;
     bottom: 0.2703rem;
-    line-height: 0.3243rem;
+    line-height: @fs12;
     background: rgba(0, 0, 0, .5);
     z-index: 1;
     color: #fff;
-    text-indent: 0.3243rem;
+    text-indent: @fs12;
     width: 100%;
 }
-

@@ -2,12 +2,16 @@
 import service from './service'
 
 const url = {
-    login:'/login'
+    login:'/login',
+    articleList:'/article/list'
 }
 
 
 export default {
     login:(params)=>{
         return service.post(url.login,params)
+    },
+    articleList:(params)=>{
+        return service.get(url.articleList,params)
     }
 }

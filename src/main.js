@@ -13,6 +13,9 @@ import './components/global'
 import './assets/common.less'
 //全局指令
 import './directive/index'
+//全局过滤器
+import './filter/index'
+
 
 
 Vue.config.productionTip = false

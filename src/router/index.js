@@ -36,7 +36,7 @@ function loginVilable(to, from, next) {
     let storeState = VueRouter.app.$options.store.state,
         token = storage.getLocalStorage('token');
 
-    if (to.path === '/login') {
+    if (to.name === 'login') {
         next()
     } else {
         //已验证登录成功
@@ -49,10 +49,13 @@ function loginVilable(to, from, next) {
 
             //没有成功登录
             if (!token) {
+
                 next({
                     path: '/login',
                     query: { redirect: to.fullPath }//把要跳转的地址作为参数传到下一步
                 })
+
+                
             } else {
                 //验证token
                 () => {
@@ -76,7 +79,6 @@ function documentTitle(to, from, next) {
     if (title) {
         document.title = title
     }
-    next()
 }
 
 Vue.use(Router)
@@ -91,12 +93,13 @@ VueRouter = new Router({
 
 //拦截路由
 VueRouter.beforeEach(function (to, from, next) {
+    //页面标题处理
+    documentTitle(to, from, next)
 
     //登录处理
     loginVilable(to, from, next)
 
-    //页面标题处理
-    documentTitle(to, from, next)
+    
 })
 
 export default VueRouter

@@ -1,87 +1,97 @@
 <template>
-  <div>
-    <ul>
-      <li v-for="(item,index) in listArr" :data-id="item.id" :key="item.id+index" @click="goDetail">
-        <div class="list-title">{{item.content}}</div>
-        <ul class="nine-gridview clear-fix list-image">
-          <li @click.stop="preview" :data-parent-id="item.id" v-for="(imgUrl,indexChild) in item.url" :key="indexChild">
-            <img :src="imgUrl" alt >
-          </li>
-        </ul>
-      </li>
-    </ul>
-    <preview-image ref="preview"></preview-image>
-  </div>
+    <scroll-view 
+      ref="scrollWrapper"
+      @scrollToEnd="scrollToEnd"
+      @scrollPulldown ="scrollPulldown"
+    >
+      <ul class="list-content">
+        <li v-for="(item,index) in list" :data-id="item.id" :key="item.id+index" @click="goDetail">
+          <div class="list-title">{{item.title}}</div>
+          <div class="list-date">{{item.datetime | datetimeToDate}}</div>
+          <ul class="nine-gridview clear-fix list-image">
+            <li @click.stop="preview" :data-parent-id="item.id" v-for="(imgItem,indexChild) in item.image" :key="indexChild">
+              <img :src="imgItem.url" alt >
+            </li>
+          </ul>
+        </li>
+      </ul>
+      <preview-image ref="preview"></preview-image>
+    </scroll-view>
 </template>
 
 <script>
-import pageList from "@/mixins/pageList";
+import pageList from "@/mixins/pageList"
+import api from '../api/index'
 import $ from 'jquery'
-import _ from "lodash";
+import _ from "lodash"
 
 export default {
   mixins: [pageList],
+  mounted(){
+    
+  },
   created() {
-    this.initList();
+    //初始化列表数据
+    this.initList().then(()=>{
+      //初始化scrollview
+      this.$nextTick(()=>{
+        this.$refs.scrollWrapper.initScroll()
+      })
+    })
   },
   data() {
     return {
-      listArr: [
-        {
-          id: "1001",
-          content: "123",
-          token: "abcd",
-          url: [
-            require("../assets/images/test1.jpg"),
-            require("../assets/images/test2.jpg"),
-            require("../assets/images/test3.jpg"),
-            require("../assets/images/test4.jpg"),
-            require("../assets/images/test5.jpg")
-          ]
-        },
-        {
-          id: "1002",
-          content: "456",
-          token: "edfg",
-          url: [require("../assets/images/test1.jpg")]
-        }
-      ]
-    };
+
+    }
   },
   methods: {
     loadData() {
-      console.log("请求数据");
+      //获取参数
+      let params = this.getParams();
+      //调用数据接口
+      return api.articleList(params).then((data)=>{
+        //总条数 计算总页面
+        this.total = data.data.total;
+        //更新数据
+        this.updateList(data.data.articleList)
+      })
+    },
+    scrollToEnd(){
+      console.log('上拉加载')
+    },
+    scrollPulldown(){
+      console.log('下拉刷新')
     },
     preview(e){
-      let itemIdx,
-          imgList=[],
-          parentId;
+      // let itemIdx,
+      //     imgList=[],
+      //     parentId;
 
-      itemIdx = $(e.currentTarget).index()
-      parentId = $(e.currentTarget).data('parentId')
-      imgList = _.find(this.listArr,{"id":_.toString(parentId)}).url
+      // itemIdx = $(e.currentTarget).index()
+      // parentId = $(e.currentTarget).data('parentId')
+      // imgList = _.find(this.listArr,{"id":_.toString(parentId)}).url
 
-      this.$refs.preview.update(imgList,itemIdx)
+      //this.$refs.preview.update(imgList,itemIdx)
     },
     goDetail(e) {
-      let el = event.currentTarget;
-      let id = el.dataset.id;
+      // let el = event.currentTarget;
+      // let id = el.dataset.id;
 
-      let itemData = _.find(this.listArr, { id });
-      let { token } = itemData;
+      // let itemData = _.find(this.listArr, { id });
+      // let { token } = itemData;
 
-      this.$router.push({
-        name: "detail",
-        params: {
-          id,
-          token,
-          meta: {
-            title: "详情页" + itemData.content
-          }
-        }
-      });
+      // this.$router.push({
+      //   name: "detail",
+      //   params: {
+      //     id,
+      //     token,
+      //     meta: {
+      //       title: "详情页" + itemData.content
+      //     }
+      //   }
+      // });
 
-      console.log(el);
+      // console.log(el);
     }
   }
 };

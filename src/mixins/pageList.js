@@ -7,6 +7,12 @@ export default {
             total: 0 //数据总条数
         }
     },
+    computed: {
+        totalPage(){
+            this.total = this.total - 0;
+            return Math.ceil(this.total / this.limit)
+        }
+    },
     methods: {
         /**
          * 获取请求参数 默认只传递page(页码) limit(每页条数) 可以由调用方传递指定对象合并(或者覆盖)原参数
@@ -24,20 +30,31 @@ export default {
          */
         loadMore() {
             this.page++
+            this.loadData()
+        },
+        /**
+         * 刷新列表
+         */
+        refreshList(){
+            this.page = 1
+            this.list = []
+            this.loadData()
         },
         /**
          * 推送到list中 因为vue的监听特性 只能用push进行数据的添加 如果有特殊处理 通过传递一个filter来过滤数据
          * @param list
          * @param filter
          */
-        pushToList(list, filter) {
-            list.forEach((item) => {
-                if (typeof filter === 'function') {
-                    this.list.push(filter(item))
-                } else {
-                    this.list.push(item)
-                }
-            })
+        updateList(list, filter) {
+
+            //过滤器处理
+            if (typeof filter === 'function') {
+                list = list.map((item) => {
+                    return filter(item);
+                })
+            }
+
+            this.list = this.list.concat(list)
         },
         /**
          * 初始化列表
@@ -45,7 +62,7 @@ export default {
         initList() {
             this.page = 1
             this.list = []
-            this.loadData()
+            return this.loadData()
         },
         /**
          * @overwrite
