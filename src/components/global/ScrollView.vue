@@ -1,16 +1,59 @@
 <template>
   <div ref="scrollWrapper" class="scroll-wrap">
     <div class="scroll-content">
-      <p class="tip pullDown">下拉刷新...</p>
+      <p :class="classPullDown">{{textPullDown}}</p>
       <slot></slot>
-      <p class="tip pullUp">上拉加载...</p>
+      <p :class="classPullUp">{{textPullUp}}</p>
     </div>
   </div>
 </template>
 
 <script>
+/**
+ * 修改说明：
+ * http://www.jq22.com/jquery-info20505
+ * 发现iScroll5中当重置位置的时候，如果当前Y坐标大于0，则固定滚动回0，无法动态设置。于是简单看了下源码，修改了以下几个地方。
+
+1. 打开iscroll-probe.js文件
+
+2. 找到：
+
+this.maxScrollX = this.wrapperWidth - this.scrollerWidth;  
+this.maxScrollY     = this.wrapperHeight - this.scrollerHeight;
+更改为：
+
+this.minScrollX     = 0;  
+this.minScrollY     = 0;  
+this.maxScrollX     = this.wrapperWidth - this.scrollerWidth;  
+this.maxScrollY     = this.wrapperHeight - this.scrollerHeight;
+3. 找到：
+
+if ( !this.hasHorizontalScroll || this.x > 0 ) {  
+   x = 0;
+} else if ( this.x < this.maxScrollX ) {
+   x = this.maxScrollX;
+}
+if ( !this.hasVerticalScroll || this.y > 0 ) {  
+   y = 0;
+} else if ( this.y < this.maxScrollY ) {
+   y = this.maxScrollY;
+}
+更改为：
+
+if ( !this.hasHorizontalScroll || this.x > 0 ) {  
+   x = this.minScrollX;
+} else if ( this.x < this.maxScrollX ) {
+   x = this.maxScrollX;
+}
+if ( !this.hasVerticalScroll || this.y > 0 ) {  
+   y = this.minScrollY;
+} else if ( this.y < this.maxScrollY ) {
+   y = this.maxScrollY;
+}
+ */
 import "../../utils/lib/iscroll-probe";
 import $ from "jquery";
+import _ from "lodash";
 
 export default {
   props: {
@@ -30,6 +73,69 @@ export default {
       default: null
     }
   },
+  data() {
+    return {
+      atRefreshPoint: false, //是否到达指定位置，即松手就可以执行刷新操作
+      atLoadMorePoint: false, //是否到达指定位置，即松手就可以执行刷新操作
+      isLoading: false, //是否正在加载数据 避免多次执行
+      pullDownText: {
+        default: "刷新",
+        lax: "松开刷新...",
+        loading: "正在刷新中……"
+      },
+      pullUpText: {
+        default: "加载",
+        lax: "松开加载...",
+        loading: "正在加载中……"
+      }
+    };
+  },
+  computed: {
+    /**
+     * 刷新样式
+     */
+    classPullDown() {
+      return {
+        tip: true,
+        pullDown: true
+      };
+    },
+    /**
+     * 加载样式
+     */
+    classPullUp() {
+      return {
+        tip: true,
+        pullUp: true
+      };
+    },
+    /**
+     * 刷新提示文字
+     */
+    textPullDown() {
+      let text;
+      if (this.atRefreshPoint && this.isLoading) {
+        text = this.pullDownText.loading;
+      } else {
+        text = this.atRefreshPoint
+          ? this.pullDownText.lax
+          : this.pullDownText.default;
+      }
+      return text;
+    },
+    /**
+     * 加载提示文字
+     */
+    textPullUp() {
+      let text;
+      if (this.atLoadMorePoint && this.isLoading) {
+        text = this.pullUpText.loading;
+      } else {
+        text = this.atLoadMorePoint ? this.pullUpText.lax : this.pullUpText.default;
+      }
+      return text;
+    }
+  },
   methods: {
     /**
      * https://zhuanlan.zhihu.com/p/27407024
@@ -40,14 +146,17 @@ export default {
      * scroll 的时机不对，或者是当 DOM 结构发送变化的时候并没有重新计算 scroll。
      */
     initScroll() {
+      let $pullDown = $(".pullDown"),
+        $pullUp = $(".pullUp");
+
       if (!this.$refs.scrollWrapper) {
         return;
       }
 
       let pullDown = 1; // 下拉刷新避免多次执行
       let pullUp = 1; // 上拉加载避免多次执行
-      let downHeight = $(".pullDown").height();
-      let upHeight = $(".pullUp").height();
+      let downHeight = $pullDown.height();
+      let upHeight = $pullUp.height();
 
       // scroll的初始化
       this.scroll = new IScroll(this.$refs.scrollWrapper, {
@@ -55,22 +164,17 @@ export default {
         fadeScrollbars: this.fadeScrollbars
       });
 
-      this.scroll.on("scroll", pos => {
+      this.scroll.on("scroll", () => {
         let y = this.scroll.y;
 
-        // 下拉加载
-        if (y >= downHeight && pullDown) {
-          $(".pullDown")
-            .addClass("refresh")
-            .html("松开刷新...");
+        // 下拉刷新 正在下拉中 而且 已经开始加载数据
+        if (y >= downHeight && !this.isLoading) {
+          this.atRefreshPoint = true;
           this.scroll.minScrollY = downHeight;
-          pullDown = 0;
         }
-        if (y <= downHeight && y >= 0 && !pullDown) {
-          $(".pullDown")
-            .removeClass("refresh")
-            .html("下拉刷新...");
-          pullDown = 1;
+        // 下拉刷新 正在下拉中 并没有加载数据
+        if (y <= downHeight && y >= 0 && !this.isLoading) {
+          this.atRefreshPoint = false;
           this.scroll.minScrollY = 0;
         }
 
@@ -92,7 +196,17 @@ export default {
         }
       });
 
-      this.scroll.on("scrollEnd", () => {});
+      this.scroll.on("scrollEnd", () => {
+        if (this.atRefreshPoint) {
+          this.isLoading = true;
+
+          //common.loadingShow();
+
+          //   setTimeout(function() {
+          //     location.reload();
+          //   }, 2000);
+        }
+      });
 
       // // 是否派发滚动事件
       // if (this.listenScroll) {

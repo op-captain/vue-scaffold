@@ -730,17 +730,35 @@ IScroll.prototype = {
 
 		time = time || 0;
 
-		if ( !this.hasHorizontalScroll || this.x > 0 ) {
-			x = 0;
-		} else if ( this.x < this.maxScrollX ) {
-			x = this.maxScrollX;
-		}
 
-		if ( !this.hasVerticalScroll || this.y > 0 ) {
-			y = 0;
-		} else if ( this.y < this.maxScrollY ) {
+		//原码注释部分 start
+
+		// if ( !this.hasHorizontalScroll || this.x > 0 ) {
+		// 	x = 0;
+		// } else if ( this.x < this.maxScrollX ) {
+		// 	x = this.maxScrollX;
+		// }
+
+		// if ( !this.hasVerticalScroll || this.y > 0 ) {
+		// 	y = 0;
+		// } else if ( this.y < this.maxScrollY ) {
+		// 	y = this.maxScrollY;
+		// }
+		
+		//原码注释部分 end
+
+		/** 自已修改部分 start */
+		if ( !this.hasHorizontalScroll || this.x > 0 ) {  
+			x = this.minScrollX;
+	 } else if ( this.x < this.maxScrollX ) {
+			x = this.maxScrollX;
+	 }
+	 if ( !this.hasVerticalScroll || this.y > 0 ) {  
+			y = this.minScrollY;
+	 } else if ( this.y < this.maxScrollY ) {
 			y = this.maxScrollY;
-		}
+	 }
+	 /** 自已修改部分 end */
 
 		if ( x == this.x && y == this.y ) {
 			return false;
@@ -770,6 +788,11 @@ IScroll.prototype = {
 
 		this.scrollerWidth	= rect.width;
 		this.scrollerHeight	= rect.height;
+
+/** 自已修改部分 start */
+		this.minScrollX     = 0;  
+		this.minScrollY     = 0;
+/** 自已修改部分 end */
 
 		this.maxScrollX		= this.wrapperWidth - this.scrollerWidth;
 		this.maxScrollY		= this.wrapperHeight - this.scrollerHeight;
