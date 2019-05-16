@@ -792,10 +792,13 @@ IScroll.prototype = {
 /** 自已修改部分 start */
 		this.minScrollX     = 0;  
 		this.minScrollY     = 0;
+
+		this.maxScrollX  = this.wrapperWidth - this.scrollerWidth;  
+		this.maxScrollY  = this.wrapperHeight - this.scrollerHeight;
 /** 自已修改部分 end */
 
-		this.maxScrollX		= this.wrapperWidth - this.scrollerWidth;
-		this.maxScrollY		= this.wrapperHeight - this.scrollerHeight;
+		// this.maxScrollX		= this.wrapperWidth - this.scrollerWidth;
+		// this.maxScrollY		= this.wrapperHeight - this.scrollerHeight;
 
 /* REPLACE END: refresh */
 

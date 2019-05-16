@@ -12,6 +12,6 @@ export default {
         return service.post(url.login,params)
     },
     articleList:(params)=>{
-        return service.get(url.articleList,params)
+        return service.get(url.articleList,{params})
     }
 }

@@ -1,13 +1,12 @@
 <template>
   <div ref="scrollWrapper" class="scroll-wrap">
     <div class="scroll-content">
-      <p :class="classPullDown">{{textPullDown}}</p>
+      <p v-if="downTipIsShow" :class="classPullDown">{{textPullDown}}</p>
       <slot></slot>
-      <p :class="classPullUp">{{textPullUp}}</p>
+      <p v-if="upTipIsShow" :class="classPullUp">{{textPullUp}}</p>
     </div>
   </div>
 </template>
-
 <script>
 /**
  * 修改说明：
@@ -26,6 +25,7 @@ this.minScrollX     = 0;
 this.minScrollY     = 0;  
 this.maxScrollX     = this.wrapperWidth - this.scrollerWidth;  
 this.maxScrollY     = this.wrapperHeight - this.scrollerHeight;
+
 3. 找到：
 
 if ( !this.hasHorizontalScroll || this.x > 0 ) {  
@@ -54,6 +54,7 @@ if ( !this.hasVerticalScroll || this.y > 0 ) {
 import "../../utils/lib/iscroll-probe";
 import $ from "jquery";
 import _ from "lodash";
+import { setTimeout } from "timers";
 
 export default {
   props: {
@@ -71,6 +72,20 @@ export default {
     data: {
       type: Array,
       default: null
+    },
+    /**
+     * 数据较少时，需要隐藏
+     */
+    upTipIsShow: {
+      type: Boolean,
+      default: true
+    },
+    /**
+     * 数据较少时，需要隐藏
+     */
+    downTipIsShow: {
+      type: Boolean,
+      default: true
     }
   },
   data() {
@@ -78,15 +93,17 @@ export default {
       atRefreshPoint: false, //是否到达指定位置，即松手就可以执行刷新操作
       atLoadMorePoint: false, //是否到达指定位置，即松手就可以执行刷新操作
       isLoading: false, //是否正在加载数据 避免多次执行
+      allComplete: false, //是否全部加载完成
       pullDownText: {
         default: "刷新",
         lax: "松开刷新...",
         loading: "正在刷新中……"
       },
       pullUpText: {
-        default: "加载",
+        default: "更多",
         lax: "松开加载...",
-        loading: "正在加载中……"
+        loading: "正在加载中……",
+        allComplete: "已全部加载完"
       }
     };
   },
@@ -114,9 +131,10 @@ export default {
      */
     textPullDown() {
       let text;
+      //正在加载数据
       if (this.atRefreshPoint && this.isLoading) {
         text = this.pullDownText.loading;
-      } else {
+      } else { //根据位置的拉动提示
         text = this.atRefreshPoint
           ? this.pullDownText.lax
           : this.pullDownText.default;
@@ -128,10 +146,15 @@ export default {
      */
     textPullUp() {
       let text;
-      if (this.atLoadMorePoint && this.isLoading) {
+      //全部数据加载完成
+      if (this.allComplete) {
+        text = this.pullUpText.allComplete;
+      } else if (this.atLoadMorePoint && this.isLoading) { //正在加载数据
         text = this.pullUpText.loading;
-      } else {
-        text = this.atLoadMorePoint ? this.pullUpText.lax : this.pullUpText.default;
+      } else { //根据位置的拉动提示
+        text = this.atLoadMorePoint
+          ? this.pullUpText.lax
+          : this.pullUpText.default;
       }
       return text;
     }
@@ -139,7 +162,7 @@ export default {
   methods: {
     /**
      * https://zhuanlan.zhihu.com/p/27407024
-     * 插件用的iscroll 但是 better-scroll里面讲解的更清楚，可以参考：
+     * 插件用的iscroll 但是 better-scroll文档里面讲解的更清楚，可以参考：
      * scroll 的初始化时机很重要，因为它在初始化的时候，会计算父元素和子元素的高度和宽度，来决定是否可以纵向和横向滚动。
      * 因此，我们在初始化它的时候，必须确保父元素和子元素的内容已经正确渲染了。
      * 如果子元素或者父元素 DOM 结构发生改变的时候，必须重新调用 scroll.refresh() 方法重新计算来确保滚动效果的正常。所以scroll 不能滚动的原因多半是初始化
@@ -149,14 +172,12 @@ export default {
       let $pullDown = $(".pullDown"),
         $pullUp = $(".pullUp");
 
+      let downHeight = $pullDown.height(),
+        upHeight = $pullUp.height();
+
       if (!this.$refs.scrollWrapper) {
         return;
       }
-
-      let pullDown = 1; // 下拉刷新避免多次执行
-      let pullUp = 1; // 上拉加载避免多次执行
-      let downHeight = $pullDown.height();
-      let upHeight = $pullUp.height();
 
       // scroll的初始化
       this.scroll = new IScroll(this.$refs.scrollWrapper, {
@@ -166,82 +187,64 @@ export default {
 
       this.scroll.on("scroll", () => {
         let y = this.scroll.y;
+        let maxHeight = this.scroll.maxScrollY;
 
-        // 下拉刷新 正在下拉中 而且 已经开始加载数据
+        // 下拉刷新 正在下拉中 而且 松开手指会开始加载数据
         if (y >= downHeight && !this.isLoading) {
-          this.atRefreshPoint = true;
+          this.atRefreshPoint = true
+          this.isLoading = true
           this.scroll.minScrollY = downHeight;
         }
-        // 下拉刷新 正在下拉中 并没有加载数据
-        if (y <= downHeight && y >= 0 && !this.isLoading) {
-          this.atRefreshPoint = false;
+        // 下拉刷新 正在下拉中 松开手指不会加载数据
+        if (y <= downHeight && y >= 0 && this.isLoading) {
+          this.atRefreshPoint = false
+          this.isLoading = false
           this.scroll.minScrollY = 0;
         }
 
-        // 上拉刷新
-        let maxHeight = this.scroll.maxScrollY;
-        if (y < maxHeight - upHeight && pullUp) {
-          $(".pullUp")
-            .addClass("loading")
-            .html("松开加载...");
+        // 上拉加载更多 正在上拉中 而且 松开手指会开始加载数据
+        if (y < maxHeight - upHeight && !this.isLoading) {
+          this.atLoadMorePoint = true
+          this.isLoading = true
+
+          //无需加载数据了，所以不用停在有显示提示dom的位置
           this.scroll.maxScrollY = maxHeight - upHeight;
-          pullUp = 0;
+
         }
-        if (y > maxHeight && y < maxHeight + upHeight && !pullUp) {
-          $(".pullUp")
-            .removeClass("loading")
-            .html("上拉加载...");
+        // 上拉加载更多 正在上拉中 而且 松开手指会不会加载数据
+        if (y > maxHeight && y < (maxHeight + upHeight) && this.isLoading) {
+          this.atLoadMorePoint = false;
+          this.isLoading = false;
           this.scroll.maxScrollY = maxHeight + upHeight;
-          pullUp = 1;
         }
       });
 
       this.scroll.on("scrollEnd", () => {
-        if (this.atRefreshPoint) {
-          this.isLoading = true;
-
-          //common.loadingShow();
-
-          //   setTimeout(function() {
-          //     location.reload();
-          //   }, 2000);
+        //发送下拉刷新派发
+        if (this.atRefreshPoint && this.isLoading) {
+          this.$emit("refreshScroll");
+        }
+        //发送上拉加载更多派发
+        if (this.atLoadMorePoint && this.isLoading && !this.allComplete) {
+          this.$emit("loadMoreScroll");
         }
       });
-
-      // // 是否派发滚动事件
-      // if (this.listenScroll) {
-      //   this.scroll.on('scroll', (pos) => {
-      //     this.$emit('scroll', pos)
-      //   })
-      // }
-
-      // // 是否派发滚动到底部事件，用于上拉加载
-      // if (this.pullup) {
-      //   this.scroll.on('scrollEnd', () => {
-      //     // 滚动到底部
-      //     if (this.scroll.y <= (this.scroll.maxScrollY + 50)) {
-      //       this.$emit('scrollToEnd')
-      //     }
-      //   })
-      // }
-
-      // // 是否派发顶部下拉事件，用于下拉刷新
-      // if (this.pulldown) {
-      //   this.scroll.on('scrollEnd', (pos) => {
-      //       //console.log(this.scroll)
-      //     // 下拉动作
-      //     if (pos.y > 50) {
-      //       this.$emit('scrollPulldown')
-      //     }
-      //   })
-      // }
-
-      // // 是否派发列表滚动开始的事件
-      // if (this.beforeScroll) {
-      //   this.scroll.on('beforeScrollStart', () => {
-      //     this.$emit('beforeScroll')
-      //   })
-      // }
+    },
+    //刷新
+    reFreshScroll() {
+      setTimeout(() => {
+        this.scroll.refresh();
+        this.isLoading = false;
+        this.atLoadMorePoint = false;
+        this.atRefreshPoint = false;
+      }, 20);
+    },
+    //不再派发[加载更多]的事件
+    closeLoadMoreScrollSend() {
+      this.allComplete = true;
+    },
+    resetLoadMoreScrollSend() {
+      this.allComplete = false;
     }
   }
 };

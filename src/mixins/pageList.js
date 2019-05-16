@@ -8,7 +8,7 @@ export default {
         }
     },
     computed: {
-        totalPage(){
+        totalPage() {
             this.total = this.total - 0;
             return Math.ceil(this.total / this.limit)
         }
@@ -30,22 +30,21 @@ export default {
          */
         loadMore() {
             this.page++
-            this.loadData()
+            return this.loadData()
         },
         /**
          * 刷新列表
          */
-        refreshList(){
+        refreshList() {
             this.page = 1
-            this.list = []
-            this.loadData()
+            return this.loadData('refresh')
         },
         /**
          * 推送到list中 因为vue的监听特性 只能用push进行数据的添加 如果有特殊处理 通过传递一个filter来过滤数据
          * @param list
          * @param filter
          */
-        updateList(list, filter) {
+        updateList(list, type, filter) {
 
             //过滤器处理
             if (typeof filter === 'function') {
@@ -53,8 +52,13 @@ export default {
                     return filter(item);
                 })
             }
+            //加载更多
+            if (type == "more") {
+                this.list = this.list.concat(list)
+            } else { //刷新
+                this.list = list
+            }
 
-            this.list = this.list.concat(list)
         },
         /**
          * 初始化列表
