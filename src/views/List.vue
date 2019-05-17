@@ -33,7 +33,7 @@ import _ from "lodash";
 import { setTimeout } from "timers";
 
 export default {
-  mixins: [pageList],
+  mixins: [pageList],//分页的列表页
   mounted() {},
   created() {
     //初始化列表数据
@@ -49,9 +49,6 @@ export default {
       });
     });
   },
-  mounted() {
-    
-  },
   data() {
     return {
       downTipIsShow: true, //是否显示下拉的提示文字
@@ -59,7 +56,7 @@ export default {
     };
   },
   methods: {
-    //该方法需要重写 mixin中的方法
+    //获取数据方法 该方法需要重写 mixin中的方法
     loadData(type) {
       //更新数据的类型，不同类型用不同方式处理
       type = type || "more";
@@ -72,10 +69,10 @@ export default {
         //总条数 计算总页面
         this.total = data.data.total;
 
-        //更新数据
+        //更新数据 渲染视图
         this.updateList(data.data.articleList, type);
 
-        //大于一页才显示 上拉，下拉的提示结构
+        //控制scrollVeiw 顶部和底部的提示DOM 大于一页才显示 上拉，下拉的提示结构
         if (this.totalPage > 1) {
           this.downTipIsShow = true;
           this.upTipIsShow = true;
@@ -108,6 +105,7 @@ export default {
         });
       });
     },
+    //预览图的事件处理方法
     preview(e) {
       let itemIdx,
         imgList = [],
@@ -130,21 +128,20 @@ export default {
       this.$refs.preview.update(imgList, itemIdx).show();
     },
     goDetail(e) {
-      // let el = event.currentTarget;
-      // let id = el.dataset.id;
-      // let itemData = _.find(this.listArr, { id });
-      // let { token } = itemData;
-      // this.$router.push({
-      //   name: "detail",
-      //   params: {
-      //     id,
-      //     token,
-      //     meta: {
-      //       title: "详情页" + itemData.content
-      //     }
-      //   }
-      // });
-      // console.log(el);
+      let el = event.currentTarget
+      let id = el.dataset.id
+
+      let itemData = _.find(this.list, { id })
+
+      this.$router.push({
+        name: "detail",
+        params: {
+          id,
+          meta: {
+            title: "详情页" + itemData.title
+          }
+        }
+      });
     }
   }
 };
