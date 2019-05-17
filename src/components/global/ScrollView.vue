@@ -183,7 +183,7 @@ export default {
       this.scroll = new IScroll(this.$refs.scrollWrapper, {
         probeType: this.probeType,
         fadeScrollbars: this.fadeScrollbars,
-        tap:'scrollViewTap'
+        tap:'scrollViewTap',
       });
 
       this.scroll.on("scroll", () => {

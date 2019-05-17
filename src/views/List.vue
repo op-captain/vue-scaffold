@@ -7,16 +7,16 @@
     @loadMoreScroll="loadMoreScroll"
   >
     <ul class="list-content">
-      <li v-for="(item,index) in list" :data-id="item.id" :key="item.id+index" @click="goDetail">
-        <div class="list-title">{{item.title}}</div>
+      <li data-tag-type="parentEle" v-for="(item,index) in list" :data-id="item.id" :key="item.id+index" @click="goDetail">
+        <div class="list-title" >{{item.title}}</div>
         <div class="list-date">{{item.datetime | datetimeToDate}}</div>
-        <ul   class="nine-gridview clear-fix list-image">
-          <li class="childImgItem"
+        <ul class="nine-gridview clear-fix list-image">
+          <li data-type="preview" class="childImgItem"
             :data-parent-id="item.id"
             v-for="(imgItem,indexChild) in item.image"
             :key="indexChild"
           >
-            <img :src="imgItem.url" alt>
+            <img data-type="preview" :data-parent-id="item.id" :src="imgItem.url" alt>
           </li>
         </ul>
       </li>
@@ -43,8 +43,16 @@ export default {
         //初始化scrollview
         this.$refs.scrollWrapper.initScroll();
         //绑定iscrollView的tap事件
-        $(".list-content").on("scrollViewTap",'.childImgItem', (e)=>{
-          this.preview(e)
+        $(".list-content").on("scrollViewTap", (e)=>{
+          let type = $(e.target).data('type')
+
+          //需要预览的图片
+          if(type === "preview"){
+            this.preview(e)
+          }else{ //进入详情
+            this.goDetail(e)
+          }
+          
         });
       });
     });
@@ -112,10 +120,15 @@ export default {
         parentId;
 
       e.stopPropagation();
+      parentId = $(e.target).data("parentId");
 
-      itemIdx = $(e.currentTarget).index();
-      parentId = $(e.currentTarget).data("parentId");
-
+      if(e.target.tagName === "IMG"){
+        itemIdx = $(e.target).parent().index()
+      }else{
+        itemIdx = $(e.target).index()
+      }
+      
+    
       //获得组件预览数据
       imgList = _.find(this.list, { id: _.toString(parentId) }).image;
 
@@ -128,8 +141,17 @@ export default {
       this.$refs.preview.update(imgList, itemIdx).show();
     },
     goDetail(e) {
-      let el = event.currentTarget
-      let id = el.dataset.id
+      let id;
+      let tagType = $(e.target).data('tagType')
+
+      console.log(e.target)
+
+      if(tagType === "parentEle"){
+        id = $(e.target).data("id")
+      }else{
+        id = $(e.target).parent().data("id")
+      }
+      
 
       let itemData = _.find(this.list, { id })
 
@@ -152,6 +174,9 @@ export default {
   width: 70%;
 }
 .list-title {
+  height: 40px;
+  line-height: 40px;
+  background:#ccc;
   text-align: left;
 }
 </style>
