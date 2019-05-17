@@ -74,9 +74,11 @@ export default {
           '<div class="swiper-zoom-container"><img src="' + o + '" /></div>'
         );
       });
-      
       this.swiper.slideTo(itemIdx,0);
       this.swiper.virtual.update();
+      return this;
+    },
+    show(){
       $(this.idWrap).fadeIn("fast");
       this.isShow = true;
     }

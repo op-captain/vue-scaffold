@@ -10,9 +10,8 @@
       <li v-for="(item,index) in list" :data-id="item.id" :key="item.id+index" @click="goDetail">
         <div class="list-title">{{item.title}}</div>
         <div class="list-date">{{item.datetime | datetimeToDate}}</div>
-        <ul class="nine-gridview clear-fix list-image">
-          <li
-            @click.stop="preview"
+        <ul   class="nine-gridview clear-fix list-image">
+          <li class="childImgItem"
             :data-parent-id="item.id"
             v-for="(imgItem,indexChild) in item.image"
             :key="indexChild"
@@ -39,11 +38,19 @@ export default {
   created() {
     //初始化列表数据
     this.initList().then(() => {
-      //初始化scrollview
+      
       this.$nextTick(() => {
+        //初始化scrollview
         this.$refs.scrollWrapper.initScroll();
+        //绑定iscrollView的tap事件
+        $(".list-content").on("scrollViewTap",'.childImgItem', (e)=>{
+          this.preview(e)
+        });
       });
     });
+  },
+  mounted() {
+    
   },
   data() {
     return {
@@ -52,17 +59,21 @@ export default {
     };
   },
   methods: {
+    //该方法需要重写 mixin中的方法
     loadData(type) {
-      type = type || 'more'
+      //更新数据的类型，不同类型用不同方式处理
+      type = type || "more";
+
       //获取参数
       let params = this.getParams();
+
       //调用数据接口
       return api.articleList(params).then(data => {
         //总条数 计算总页面
         this.total = data.data.total;
 
         //更新数据
-        this.updateList(data.data.articleList,type);
+        this.updateList(data.data.articleList, type);
 
         //大于一页才显示 上拉，下拉的提示结构
         if (this.totalPage > 1) {
@@ -78,6 +89,7 @@ export default {
         }
       });
     },
+    //滑动到底部的加载更多的事件处理方法
     loadMoreScroll() {
       this.loadMore().then(() => {
         this.$nextTick(() => {
@@ -85,23 +97,37 @@ export default {
         });
       });
     },
+    //下拉刷新事件的处理方法
     refreshScroll() {
       this.refreshList().then(() => {
         this.$nextTick(() => {
           this.$refs.scrollWrapper.reFreshScroll();
+
           //刷新列表数据重置为最新的第一页数据，所以要重置是否源发事件的 状态数据
-          this.$refs.scrollWrapper.resetLoadMoreScrollSend()
+          this.$refs.scrollWrapper.resetLoadMoreScrollSend();
         });
       });
     },
     preview(e) {
-      // let itemIdx,
-      //     imgList=[],
-      //     parentId;
-      // itemIdx = $(e.currentTarget).index()
-      // parentId = $(e.currentTarget).data('parentId')
-      // imgList = _.find(this.listArr,{"id":_.toString(parentId)}).url
-      //this.$refs.preview.update(imgList,itemIdx)
+      let itemIdx,
+        imgList = [],
+        parentId;
+
+      e.stopPropagation();
+
+      itemIdx = $(e.currentTarget).index();
+      parentId = $(e.currentTarget).data("parentId");
+
+      //获得组件预览数据
+      imgList = _.find(this.list, { id: _.toString(parentId) }).image;
+
+      imgList = imgList.map(item => {
+        return item.url;
+      });
+      console.log(imgList);
+
+      //更新数据，显示组件预览
+      this.$refs.preview.update(imgList, itemIdx).show();
     },
     goDetail(e) {
       // let el = event.currentTarget;

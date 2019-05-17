@@ -182,7 +182,8 @@ export default {
       // scroll的初始化
       this.scroll = new IScroll(this.$refs.scrollWrapper, {
         probeType: this.probeType,
-        fadeScrollbars: this.fadeScrollbars
+        fadeScrollbars: this.fadeScrollbars,
+        tap:'scrollViewTap'
       });
 
       this.scroll.on("scroll", () => {
