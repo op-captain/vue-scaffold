@@ -9,6 +9,8 @@ import store from './store/index'
 import 'amfe-flexible'
 //全局组件
 import './components/global'
+//验证规则
+import './utils/validatorRules'
 //全局样式
 import './assets/common.less'
 //全局指令

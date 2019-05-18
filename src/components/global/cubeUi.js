@@ -4,19 +4,46 @@
  * 需要使用Vue.use方法才能使用
  * 官方说明：https://didi.github.io/cube-ui/#/zh-CN/docs/quick-start
  */
+
 import Vue from 'vue';
 import {
     Style,
-    Dialog,
+    Checkbox,
+    CheckboxGroup,
+    Radio,
+    Checker,
+    Input,
+    Textarea,
+    Select,
+    Switch,
+    Rate,
+    Upload,
+    Form,
     Button,
     Loading,
+    Tip,
+    Toolbar,
+    Validator
 } from 'cube-ui';
 
 var componentNames = [
     Style,
-    Dialog,
+    Checkbox,
+    CheckboxGroup,
+    Radio,
+    Checker,
+    Input,
+    Textarea,
+    Select,
+    Switch,
+    Rate,
+    Upload,
+    Form,
     Button,
-    Loading
+    Loading,
+    Tip,
+    Toolbar,
+    Validator
 ]
 
 componentNames.forEach(name => {
