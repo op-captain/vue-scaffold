@@ -23,7 +23,18 @@ import {
     Loading,
     Tip,
     Toolbar,
-    Validator
+    Popup,
+    Toast,
+    Picker,
+    CascadePicker,
+    DatePicker,
+    TimePicker,
+    SegmentPicker,
+    Dialog,
+    ActionSheet,
+    Drawer,
+    TabBar,
+    Validator,
 } from 'cube-ui';
 
 var componentNames = [
@@ -42,8 +53,19 @@ var componentNames = [
     Button,
     Loading,
     Tip,
+    Popup,
+    Toast,
+    Picker,
+    CascadePicker,
+    DatePicker,
+    TimePicker,
+    SegmentPicker,
+    Dialog,
+    ActionSheet,
+    Drawer,
     Toolbar,
-    Validator
+    TabBar,
+    Validator,
 ]
 
 componentNames.forEach(name => {

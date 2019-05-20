@@ -4,7 +4,6 @@
     <cube-button @click="showDialog">show dialog</cube-button>
     <cube-loading v-if="loading"></cube-loading>
     <bottom-tab-navigator></bottom-tab-navigator>
-    
   </div>
 </template>
 

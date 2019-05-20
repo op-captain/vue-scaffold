@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 import storage from '@/utils/localStorage'
+import _ from 'lodash'
 import api from '@/api/index'
 
 
@@ -10,7 +11,7 @@ let VueRouter
 
 let routes = []
 
-//处理路由
+//处理路由模块
 function formRouter() {
 
     // 获取组件目录下符合 一定 正则表达式的 组件
@@ -36,7 +37,7 @@ function loginVilable(to, from, next) {
     let storeState = VueRouter.app.$options.store.state,
         token = storage.getLocalStorage('token');
 
-    if (to.name === 'login') {
+    if (to.path === '/login') {
         next()
     } else {
         //已验证登录成功
@@ -55,7 +56,7 @@ function loginVilable(to, from, next) {
                     query: { redirect: to.fullPath }//把要跳转的地址作为参数传到下一步
                 })
 
-                
+
             } else {
                 //验证token
                 () => {
@@ -81,6 +82,30 @@ function documentTitle(to, from, next) {
     }
 }
 
+//底部tabBar
+function tabBarBottom(to, from, next) {
+    if (to.path === '/' || to.path === '/list' || to.path === '/my') {
+        let label = _.find(VueRouter.app.$options.store.state.tabBarBottom.tabs, { path: to.path }).label
+        
+        VueRouter.app.$options.store.commit('TabBarBottomDisplay', true)
+        VueRouter.app.$options.store.commit('TabBarBottomSelectedLabel', label)
+    } else {
+        VueRouter.app.$options.store.commit('TabBarBottomDisplay', false)
+    }
+}
+
+//顶部navTop
+function navTop(to, from, next) {
+    let backIs = true;
+    
+    if(to.path === '/' ){
+        backIs = false
+    }
+    VueRouter.app.$options.store.commit('navTopBackDisplay', backIs)
+    VueRouter.app.$options.store.commit('navTopTitle', to.meta.title)
+
+}
+
 Vue.use(Router)
 
 formRouter()
@@ -96,10 +121,16 @@ VueRouter.beforeEach(function (to, from, next) {
     //页面标题处理
     documentTitle(to, from, next)
 
+    //底部tabBar
+    tabBarBottom(to, from, next)
+
+    //顶部
+    navTop(to, from, next)
+
     //登录处理
     loginVilable(to, from, next)
 
-    
+
 })
 
 export default VueRouter

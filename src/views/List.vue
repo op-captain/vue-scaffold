@@ -36,6 +36,7 @@ export default {
   mixins: [pageList],//分页的列表页
   mounted() {},
   created() {
+    console.log(this.$route.query)
     //初始化列表数据
     this.initList().then(() => {
       
