@@ -254,8 +254,8 @@ export default {
 <style lang="less" scoped>
 .scroll-wrap {
   position: absolute;
-  top: 73px;
-  bottom: 0px;
+  top: 40px;
+  bottom: 40px;
   width: 100%;
   overflow: hidden;
   background: #3e3e3e;

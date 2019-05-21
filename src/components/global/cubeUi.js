@@ -34,6 +34,7 @@ import {
     ActionSheet,
     Drawer,
     TabBar,
+    Scroll,
     Validator,
 } from 'cube-ui';
 
@@ -65,6 +66,7 @@ var componentNames = [
     Drawer,
     Toolbar,
     TabBar,
+    Scroll,
     Validator,
 ]
 

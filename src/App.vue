@@ -63,6 +63,7 @@ export default {
     border-top: 1px solid #ccc;
     background: #fff;
     position: fixed;
+    z-index: 2;
     width: 100%;
     bottom: 0;
     left: 0;

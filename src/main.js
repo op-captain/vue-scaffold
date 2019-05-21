@@ -19,7 +19,7 @@ import './directive/index'
 import './filter/index'
 
 //修复移动 :active 样式无效的问题。例如 button 需要这个样式
-document.body.addEventListener('touchstart', (e)=>{});
+// document.body.addEventListener('touchstart', (e)=>{});
 
 //阻止页面整个被拖动
 document.body.addEventListener('touchmove', function (e) {

@@ -1,7 +1,7 @@
 <template>
   <div class="nav-top">
     <div class="left" >
-      <span v-if="back"><i class="cubeic-back"></i></span>
+      <span class="back-wrap" v-if="back" @click="backHandler"><i class="cubeic-back"></i></span>
     </div>
     <div class="center">
       <span>{{title}}</span>
@@ -31,7 +31,7 @@ export default {
     },
     methods:{
         backHandler(){
-
+          this.$router.go(-1)
         }
     }
 }
@@ -44,7 +44,7 @@ export default {
   top: 0;
   left: 0;
   width: 100%;
-  z-index: 1;
+  z-index: 2;
   height: 40px;
   background: red;
   color: #fff;
@@ -54,6 +54,10 @@ export default {
       align-items: center;
     height: 40px;
     width: 40px;
+    .back-wrap{
+      display: block;
+      padding: 14px;
+    }
   }
   .right {
     height: 40px;

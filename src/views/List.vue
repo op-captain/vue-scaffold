@@ -1,28 +1,60 @@
 <template>
-  <scroll-view
-    ref="scrollWrapper"
-    :downTipIsShow="downTipIsShow"
-    :upTipIsShow="upTipIsShow"
-    @refreshScroll="refreshScroll"
-    @loadMoreScroll="loadMoreScroll"
-  >
-    <ul class="list-content">
-      <li data-tag-type="parentEle" v-for="(item,index) in list" :data-id="item.id" :key="item.id+index" @click="goDetail">
-        <div class="list-title" >{{item.title}}</div>
-        <div class="list-date">{{item.datetime | datetimeToDate}}</div>
-        <ul class="nine-gridview clear-fix list-image">
-          <li data-type="preview" class="childImgItem"
-            :data-parent-id="item.id"
-            v-for="(imgItem,indexChild) in item.image"
-            :key="indexChild"
+  <div class="scroll-wrap">
+    <cube-scroll ref="scroll"
+    :data="list"
+    :options="options"
+    @pulling-down="onPullingDown" 
+    @pulling-up="onPullingUp">
+      <ul class="list-content">
+        <li
+          v-for="(item,index) in list"
+          :data-id="item.id"
+          :key="item.id+index"
+        >
+          <div @click="goDetail" class="list-title">{{item.title}}</div>
+          <div class="list-date">{{item.datetime | datetimeToDate}}</div>
+          <ul class="nine-gridview clear-fix list-image">
+            <li
+              class="childImgItem"
+              :data-parent-id="item.id"
+              v-for="(imgItem,indexChild) in item.image"
+              :key="indexChild"
+              :data-index="indexChild"
+              @click="preview"
+            >
+              <img @load="onImgLoad" data-type="preview" :data-parent-id="item.id" :src="imgItem.url" alt>
+            </li>
+          </ul>
+        </li>
+      </ul>
+      <template slot="pulldown" slot-scope="props">
+        <div
+          v-if="props.pullDownRefresh"
+          class="cube-pulldown-wrapper"
+          :style="props.pullDownStyle"
+        >
+          <div
+            v-if="props.beforePullDown"
+            class="before-trigger"
+            :style="{paddingTop: props.bubbleY + 'px'}"
           >
-            <img data-type="preview" :data-parent-id="item.id" :src="imgItem.url" alt>
-          </li>
-        </ul>
-      </li>
-    </ul>
+            <span :class="{rotate: props.bubbleY > options.pullDownRefresh.threshold - 60}">↓</span>
+          </div>
+          <div class="after-trigger" v-else>
+            <div v-show="props.isPullingDown" class="loading">
+              <cube-loading></cube-loading>
+            </div>
+            <transition name="success">
+              <div v-show="!props.isPullingDown" class="text-wrapper">
+                <span class="refresh-text">成功更新！</span>
+              </div>
+            </transition>
+          </div>
+        </div>
+      </template>
+    </cube-scroll>
     <preview-image ref="preview"></preview-image>
-  </scroll-view>
+  </div>
 </template>
 
 <script>
@@ -30,38 +62,37 @@ import pageList from "@/mixins/pageList";
 import api from "../api/index";
 import $ from "jquery";
 import _ from "lodash";
-import { setTimeout } from "timers";
 
 export default {
-  mixins: [pageList],//分页的列表页
+  mixins: [pageList], //分页的列表页
   mounted() {},
   created() {
-    console.log(this.$route.query)
+    console.log(this.$route.query);
     //初始化列表数据
     this.initList().then(() => {
-      
       this.$nextTick(() => {
-        //初始化scrollview
-        this.$refs.scrollWrapper.initScroll();
-        //绑定iscrollView的tap事件
-        $(".list-content").on("scrollViewTap", (e)=>{
-          let type = $(e.target).data('type')
-
-          //需要预览的图片
-          if(type === "preview"){
-            this.preview(e)
-          }else{ //进入详情
-            this.goDetail(e)
-          }
-          
-        });
+        this.$refs.scroll.refresh();
       });
     });
   },
   data() {
     return {
-      downTipIsShow: true, //是否显示下拉的提示文字
-      upTipIsShow: true //是否显示上拉的提示文字
+      options: { //滚动组件配置项 https://didi.github.io/cube-ui/#/zh-CN/docs/scroll#cube-%E6%8F%92%E6%A7%BD-anchor
+        pullDownRefresh: {
+          threshold: 60,
+          // stop: 44,
+          stopTime: 1000,
+          txt: '更新成功'
+        },
+        pullUpLoad: {
+          txt:{
+            more:"加载更多",
+            noMore:"没有更多数据了"
+          }
+            
+        }
+      },
+      secondStop:26
     };
   },
   methods: {
@@ -81,36 +112,35 @@ export default {
         //更新数据 渲染视图
         this.updateList(data.data.articleList, type);
 
-        //控制scrollVeiw 顶部和底部的提示DOM 大于一页才显示 上拉，下拉的提示结构
-        if (this.totalPage > 1) {
-          this.downTipIsShow = true;
-          this.upTipIsShow = true;
-        } else {
-          this.upTipIsShow = false;
-        }
-
+      });
+    },
+    //下拉刷新
+    onPullingDown(){
+      this.refreshList()
+    },
+    //上拉加载
+    onPullingUp(){
         //已经加载过最后一页数据了，没有更多数据
         if (this.totalPage === this.page) {
-          this.$refs.scrollWrapper.closeLoadMoreScrollSend();
+          this.$refs.scroll.forceUpdate()
+        }else{
+          this.loadMoreScroll()
         }
-      });
+    },
+    //图片加载完成
+    onImgLoad() {
+      try{
+        const scroll = this.$refs.scroll
+        scroll.scroll.beforePullDown && scroll.refresh()
+      }catch(e){
+        console.log(e)
+      }
     },
     //滑动到底部的加载更多的事件处理方法
     loadMoreScroll() {
       this.loadMore().then(() => {
         this.$nextTick(() => {
-          this.$refs.scrollWrapper.reFreshScroll();
-        });
-      });
-    },
-    //下拉刷新事件的处理方法
-    refreshScroll() {
-      this.refreshList().then(() => {
-        this.$nextTick(() => {
-          this.$refs.scrollWrapper.reFreshScroll();
-
-          //刷新列表数据重置为最新的第一页数据，所以要重置是否源发事件的 状态数据
-          this.$refs.scrollWrapper.resetLoadMoreScrollSend();
+          this.$refs.scroll.refresh();
         });
       });
     },
@@ -123,38 +153,29 @@ export default {
       e.stopPropagation();
       parentId = $(e.target).data("parentId");
 
-      if(e.target.tagName === "IMG"){
-        itemIdx = $(e.target).parent().index()
-      }else{
-        itemIdx = $(e.target).index()
-      }
-      
-    
       //获得组件预览数据
       imgList = _.find(this.list, { id: _.toString(parentId) }).image;
 
       imgList = imgList.map(item => {
         return item.url;
       });
+
+      itemIdx = $(e.target)
+        .parent()
+        .data("index");
       console.log(imgList);
 
       //更新数据，显示组件预览
       this.$refs.preview.update(imgList, itemIdx).show();
     },
+    //详情页
     goDetail(e) {
       let id;
-      let tagType = $(e.target).data('tagType')
 
-      console.log(e.target)
-
-      if(tagType === "parentEle"){
-        id = $(e.target).data("id")
-      }else{
-        id = $(e.target).parent().data("id")
-      }
+      console.log(e.target);
+      id = $(e.target).parent().data("id");
       
-
-      let itemData = _.find(this.list, { id })
+      let itemData = _.find(this.list, { id });
 
       this.$router.push({
         name: "detail",
@@ -171,13 +192,74 @@ export default {
 </script>
 
 <style lang="less" scoped>
+@import url("../assets/variables.less");
+
+.scroll-wrap {
+  position: absolute;
+  width: 100%;
+  top: @absoultTop;
+  bottom: @absoultTop;
+  overflow: hidden;
+  .cube-pulldown-wrapper {
+    text-align: center;
+    .before-trigger {
+      height: auto;
+      font-size: 30px;
+      align-self: flex-end;
+      span {
+        display: inline-block;
+        line-height: 1;
+        transition: all 0.3s;
+        color: #666;
+        padding: 15px 0;
+        &.rotate {
+          transform: rotate(180deg);
+        }
+      }
+    }
+    .after-trigger {
+      flex: 1;
+      margin: 0;
+      .loading{
+        width: 0.64rem;
+        margin: 0 auto;
+      }
+      .text-wrapper {
+        margin: 0 auto;
+        margin-top: 14px;
+        padding: 5px 0;
+        color: #498ec2;
+        background-color: #d6eaf8;
+      }
+
+      .cube-loading-spinners {
+        margin: auto;
+      }
+    }
+  }
+  .success-enter-active,
+  .success-leave-active {
+    transition: width 0.5s;
+  }
+
+  .success-enter,
+  .success-leave-to {
+    width: 70%;
+  }
+
+  .success-enter-to,
+  .success-leave {
+    width: 100%;
+  }
+}
+
 .list-image {
   width: 70%;
 }
 .list-title {
   height: 40px;
   line-height: 40px;
-  background:#ccc;
+  background: #ccc;
   text-align: left;
 }
 </style>

@@ -86,5 +86,42 @@ export default {
 };
 </script>
 
-<style>
+
+<style lang="less">
+@fs12:12px;
+@fs14:14px;
+/*swiper 预览图样式*/
+#origin-img {
+    display: block;
+    position: fixed;
+    z-index: 9999;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: #000;
+    .swiper-slide {
+        img {
+            width: 100%;
+            vertical-align: middle;
+        }
+    }
+    .swiper-pagination {
+        font-size: @fs12;
+        top: 0.4324rem;
+        bottom: auto;
+        color: #fff;
+    }
+    .img-info {
+        position: absolute;
+        font-size: @fs14;
+        bottom: 0.2703rem;
+        line-height: @fs12;
+        background: rgba(0, 0, 0, .5);
+        z-index: 1;
+        color: #fff;
+        text-indent: @fs12;
+        width: 100%;
+    }
+}
 </style>
