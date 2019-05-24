@@ -17,8 +17,8 @@
     <span class="btn btn-success fileinput-button">
       <i class="glyphicon glyphicon-plus"></i>
       <span>Select files...</span>
-      <!-- The file input field used as target for the file upload widget -->
-      <input id="fileupload" type="file" name="files" multiple>
+      <!-- 这个name:file的名字 要和后端req.file名字一致 -->
+      <input id="fileupload" type="file" name="file" multiple>
     </span>
     <div id="progress" class="progress">
       <div class="progress-bar progress-bar-success"></div>
@@ -64,8 +64,6 @@ export default {
         dataType:"json",
         autoUpload: false,
         acceptFileTypes: /(\.|\/)(gif|jpe?g|png)$/i,
-        //跨域
-        // 　　　　 forceIframeTransport: true,
         maxFileSize: 999000,
         // Enable image resizing, except for Android and Opera,
         // which actually support image resizing, but fail to
