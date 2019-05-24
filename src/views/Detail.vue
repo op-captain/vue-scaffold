@@ -49,9 +49,7 @@ export default {
 @import url('../assets/variables.less');
 
 .scroll-list-wrap {
-  position: absolute;
-  top:@absoultTop;
-  bottom:0;
+  .mixin-class-scrollWrapNotBottom;
   overflow: hidden;
 }
 h2 {

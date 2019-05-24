@@ -116,6 +116,10 @@ export default {
     },
     //下拉刷新
     onPullingDown(){
+      //已经加载过最后一页数据了，没有更多数据
+      if (this.totalPage === this.page) {
+        this.$refs.scroll.resetPullUpTxt()
+      }
       this.refreshList()
     },
     //上拉加载

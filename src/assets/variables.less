@@ -1,1 +1,16 @@
 @absoultTop:40px;
+@absoultBottom:40px;
+
+//mixin
+.mixin-class-scrollWrap(){
+    position: absolute;
+    z-index: 1;
+    top:@absoultTop;
+    bottom:@absoultBottom
+}
+.mixin-class-scrollWrapNotBottom(){
+    position: absolute;
+    z-index: 1;
+    top:@absoultTop;
+    bottom: 0;
+}
