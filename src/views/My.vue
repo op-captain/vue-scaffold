@@ -93,16 +93,15 @@ export default {
           file = data.files[index],
           node = $(data.context.children()[index]);
         if (file.preview) {
+          //blob处理是异步的
           var a = file.preview.toBlob(function(blob) {
-            // Do something with the blob object,
-            // e.g. creating a multipart form for file uploads:
-            //var formData = new FormData();
-            // formData.append("file", blob, "abc");
-            /* ... */
-            console.log();
 
+            /* ... */
             //node.prepend("<br>").prepend(file.preview);
+
+            //将file.preview 的canvas对象转换成 blob对象 为了能配合jcrop裁剪功能
             let img_url = URL.createObjectURL(blob)
+
             node.prepend("<br>").prepend($('<img>').attr('src',img_url));
 
             if (file.error) {
