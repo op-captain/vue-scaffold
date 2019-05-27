@@ -2,7 +2,7 @@
   <div class="wrap">
     <h2>个人中心</h2>
     <p>Normal upload(File max size 1MB):</p>
-    <div>
+    <div id="wrap" style="display:none">
       <cube-upload
         ref="upload"
         :action="action"
@@ -24,6 +24,9 @@
       <div class="progress-bar progress-bar-success"></div>
     </div>
     <div id="files" class="files"></div>
+    <cropper ref="corpper">
+      <img :src="cropperUrl" alt>
+    </cropper>
   </div>
 </template>
 
@@ -34,10 +37,12 @@ import "../utils/lib/jQuery-File-Upload/canvas-to-blob.min.js";
 import "../utils/lib/jQuery-File-Upload/jquery.iframe-transport.js";
 import "../utils/lib/jQuery-File-Upload/jquery.fileupload.js";
 import "../utils/lib/jQuery-File-Upload/jquery.fileupload-image.js";
+import { setTimeout } from "timers";
 
 export default {
   mounted() {
-    "use strict";
+    var that = this;
+    ("use strict");
     // Change this to the location of your server-side upload handler:
     var url = "http://192.168.1.109:3000/api/v1/upload",
       uploadButton = $("<button/>")
@@ -68,17 +73,19 @@ export default {
         // Enable image resizing, except for Android and Opera,
         // which actually support image resizing, but fail to
         // send Blob objects via XHR requests:
-        disableImageResize: /Android(?!.*Chrome)|Opera/.test(
-          window.navigator.userAgent
-        ),
-        previewMaxWidth: 100,
-        previewMaxHeight: 100,
+        // disableImageResize: /Android(?!.*Chrome)|Opera|/.test(
+        //   window.navigator.userAgent
+        // ),
+        // previewMaxWidth: 100,
+        // previewMaxHeight: 100,
         previewCrop: true,
         beforeSend: function(xhr, data) {
+          
           // xhr.setRequestHeader("Access-Control-Request-Headers", "accept, origin, authorization");
         }
       })
       .on("fileuploadadd", function(e, data) {
+        console.log(window.navigator.userAgent)
         data.context = $("<div/>").appendTo("#files");
         $.each(data.files, function(index, file) {
           var node = $("<p/>").append($("<span/>").text(file.name));
@@ -89,20 +96,45 @@ export default {
         });
       })
       .on("fileuploadprocessalways", function(e, data) {
+        console.log(data)
         var index = data.index,
           file = data.files[index],
           node = $(data.context.children()[index]);
+
+          
+
+           //定义一个文件阅读器
+        var reader = new FileReader();
+
+        //文件装载后将其显示在图片预览里
+        reader.onload=function(){
+            // $("#img_preview").attr("src", this.result);
+            var bf = this.result;
+  				  var blob = new Blob([bf],{type:"text/plain"});
+
+            that.cropperUrl = URL.createObjectURL(blob) ;
+        }
+
+        //装载文件
+        reader.readAsArrayBuffer(data.originalFiles[index]);
+
+
         if (file.preview) {
           //blob处理是异步的
           var a = file.preview.toBlob(function(blob) {
-
             /* ... */
-            //node.prepend("<br>").prepend(file.preview); 
+            //node.prepend("<br>").prepend(file.preview);
 
             //将file.preview 的canvas对象转换成 blob对象 为了能配合jcrop裁剪功能
-            let img_url = URL.createObjectURL(blob)
+            let img_url = URL.createObjectURL(blob);
 
-            node.prepend("<br>").prepend($('<img>').attr('src',img_url));
+            node.prepend("<br>").prepend($("<img>").attr("src", img_url));
+
+            // that.cropperUrl = img_url;
+
+            setTimeout(() => {
+              that.$refs.corpper.cropperCreate();
+            }, 500);
 
             if (file.error) {
               node
@@ -155,6 +187,7 @@ export default {
   },
   data() {
     return {
+      cropperUrl: "",
       action: "http://192.168.1.109:3001/api/v1/upload",
       isUploading: true
     };
