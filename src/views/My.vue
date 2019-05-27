@@ -97,7 +97,7 @@ export default {
           var a = file.preview.toBlob(function(blob) {
 
             /* ... */
-            //node.prepend("<br>").prepend(file.preview);
+            //node.prepend("<br>").prepend(file.preview); 
 
             //将file.preview 的canvas对象转换成 blob对象 为了能配合jcrop裁剪功能
             let img_url = URL.createObjectURL(blob)
