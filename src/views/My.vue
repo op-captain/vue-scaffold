@@ -42,7 +42,7 @@ export default {
     var url = "http://192.168.1.109:3000/api/v1/upload",
       uploadButton = $("<button/>")
         .addClass("btn btn-primary")
-        .prop("disabled", true)
+        .prop("disabled", false)
         .text("Processing...")
         .on("click", function() {
           var $this = $(this),
@@ -61,7 +61,7 @@ export default {
     $("#fileupload")
       .fileupload({
         url: url,
-        dataType:"json",
+        dataType: "json",
         autoUpload: false,
         acceptFileTypes: /(\.|\/)(gif|jpe?g|png)$/i,
         maxFileSize: 999000,
@@ -93,18 +93,32 @@ export default {
           file = data.files[index],
           node = $(data.context.children()[index]);
         if (file.preview) {
-          node.prepend("<br>").prepend(file.preview);
-        }
-        if (file.error) {
-          node
-            .append("<br>")
-            .append($('<span class="text-danger"/>').text(file.error));
-        }
-        if (index + 1 === data.files.length) {
-          data.context
-            .find("button")
-            .text("Upload")
-            .prop("disabled", !!data.files.error);
+          var a = file.preview.toBlob(function(blob) {
+            // Do something with the blob object,
+            // e.g. creating a multipart form for file uploads:
+            //var formData = new FormData();
+            // formData.append("file", blob, "abc");
+            /* ... */
+            console.log();
+
+            //node.prepend("<br>").prepend(file.preview);
+            let img_url = URL.createObjectURL(blob)
+            node.prepend("<br>").prepend($('<img>').attr('src',img_url));
+
+            if (file.error) {
+              node
+                .append("<br>")
+                .append($('<span class="text-danger"/>').text(file.error));
+            }
+            if (index + 1 === data.files.length) {
+              data.context
+                .find("button")
+                .text("Upload")
+                .prop("disabled", !!data.files.error);
+            }
+          }, "image/jpeg");
+
+          console.log(a);
         }
       })
       .on("fileuploadprogressall", function(e, data) {
@@ -142,7 +156,7 @@ export default {
   },
   data() {
     return {
-      action: "http://192.168.1.109:3000/api/v1/upload",
+      action: "http://192.168.1.109:3001/api/v1/upload",
       isUploading: true
     };
   },
