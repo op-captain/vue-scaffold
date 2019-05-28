@@ -1,6 +1,6 @@
 <template>
   <div class="wrap">
-    <h2>个人中心</h2>
+    <h2>个人中心abc</h2>
     <p>Normal upload(File max size 1MB):</p>
     <div id="wrap" style="display:none">
       <cube-upload
@@ -25,7 +25,7 @@
     </div>
     <div id="files" class="files"></div>
     <cropper ref="corpper">
-      <img :src="cropperUrl" alt>
+      <img v-if="cropperUrl" :src="cropperUrl" alt>
     </cropper>
   </div>
 </template>
@@ -37,8 +37,31 @@ import "../utils/lib/jQuery-File-Upload/canvas-to-blob.min.js";
 import "../utils/lib/jQuery-File-Upload/jquery.iframe-transport.js";
 import "../utils/lib/jQuery-File-Upload/jquery.fileupload.js";
 import "../utils/lib/jQuery-File-Upload/jquery.fileupload-image.js";
-import { setTimeout } from "timers";
+// import "../utils/lib/exif.js"
 
+/**
+ * 
+ * 
+ //定义一个文件阅读器
+        var reader = new FileReader();
+
+        //文件装载后将其显示在图片预览里
+        reader.onload = function() {
+          // $("#img_preview").attr("src", this.result);
+          var bf = this.result;
+          var blob = new Blob([bf], { type: "text/plain" });
+
+          that.cropperUrl = URL.createObjectURL(blob);
+
+          that.$nextTick(() => {
+            //初始化裁剪插件
+            that.$refs.corpper.cropperCreate();
+          });
+        };
+
+        //装载文件
+        reader.readAsArrayBuffer(data.originalFiles[index]);
+ */
 export default {
   mounted() {
     var that = this;
@@ -63,29 +86,32 @@ export default {
             $this.remove();
           });
         });
+    //option api https://github.com/blueimp/jQuery-File-Upload/wiki/Options
     $("#fileupload")
       .fileupload({
         url: url,
         dataType: "json",
         autoUpload: false,
-        acceptFileTypes: /(\.|\/)(gif|jpe?g|png)$/i,
+        loadImageFileTypes: /^image\/(gif|jpeg|png|bmp|svg\+xml)$/, //图片格式
+        acceptFileTypes: /(\.|\/)(gif|jpe?g|png|bmp)$/i, //文件格式
         maxFileSize: 999000,
         // Enable image resizing, except for Android and Opera,
         // which actually support image resizing, but fail to
         // send Blob objects via XHR requests:
-        // disableImageResize: /Android(?!.*Chrome)|Opera|/.test(
-        //   window.navigator.userAgent
-        // ),
-        // previewMaxWidth: 100,
-        // previewMaxHeight: 100,
-        previewCrop: true,
+        disableImageResize: /Android(?!.*Chrome)|Opera|/.test(
+          window.navigator.userAgent
+        ),
+        disableExif: true, //避免移动端图片方向不正确，PC端 false和 true都可以
+        previewCanvas: false, //预览图使用 img 而不是 canvas
+        previewMaxWidth: 100, //预览图的大小
+        previewMaxHeight: 100,
+        // previewCrop: true, //统一正方形预览图，但是移动端会图片方向会不正确
         beforeSend: function(xhr, data) {
-          
           // xhr.setRequestHeader("Access-Control-Request-Headers", "accept, origin, authorization");
         }
       })
       .on("fileuploadadd", function(e, data) {
-        console.log(window.navigator.userAgent)
+        console.log(window.navigator.userAgent);
         data.context = $("<div/>").appendTo("#files");
         $.each(data.files, function(index, file) {
           var node = $("<p/>").append($("<span/>").text(file.name));
@@ -96,60 +122,37 @@ export default {
         });
       })
       .on("fileuploadprocessalways", function(e, data) {
-        console.log(data)
+        console.log(data);
+
         var index = data.index,
           file = data.files[index],
           node = $(data.context.children()[index]);
 
-          
-
-           //定义一个文件阅读器
-        var reader = new FileReader();
-
-        //文件装载后将其显示在图片预览里
-        reader.onload=function(){
-            // $("#img_preview").attr("src", this.result);
-            var bf = this.result;
-  				  var blob = new Blob([bf],{type:"text/plain"});
-
-            that.cropperUrl = URL.createObjectURL(blob) ;
-        }
-
-        //装载文件
-        reader.readAsArrayBuffer(data.originalFiles[index]);
-
-
         if (file.preview) {
-          //blob处理是异步的
-          var a = file.preview.toBlob(function(blob) {
-            /* ... */
-            //node.prepend("<br>").prepend(file.preview);
+          //报错
+          if (file.error) {
+            node
+              .append("<br>")
+              .append($('<span class="text-danger"/>').text(file.error));
+          }
+          //上传按钮设置
+          if (index + 1 === data.files.length) {
+            data.context
+              .find("button")
+              .text("Upload")
+              .prop("disabled", !!data.files.error);
+          }
 
-            //将file.preview 的canvas对象转换成 blob对象 为了能配合jcrop裁剪功能
-            let img_url = URL.createObjectURL(blob);
+          //设置裁剪图的数据
+          that.cropperUrl = URL.createObjectURL(file);
 
-            node.prepend("<br>").prepend($("<img>").attr("src", img_url));
+          that.$nextTick(() => {
+            //初始化裁剪插件
+            that.$refs.corpper.cropperCreate();
+          });
 
-            // that.cropperUrl = img_url;
-
-            setTimeout(() => {
-              that.$refs.corpper.cropperCreate();
-            }, 500);
-
-            if (file.error) {
-              node
-                .append("<br>")
-                .append($('<span class="text-danger"/>').text(file.error));
-            }
-            if (index + 1 === data.files.length) {
-              data.context
-                .find("button")
-                .text("Upload")
-                .prop("disabled", !!data.files.error);
-            }
-          }, "image/jpeg");
-
-          console.log(a);
+          //创建预览图
+          node.prepend("<br>").prepend(file.preview);
         }
       })
       .on("fileuploadprogressall", function(e, data) {

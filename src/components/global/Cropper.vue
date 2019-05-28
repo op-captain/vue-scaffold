@@ -18,6 +18,7 @@ export default {
       let $img = $("#cropperImg img");
 
       $img.cropper({
+        dragMode:"move",
         crop: function(event) {
           console.log(event.detail.x);
           console.log(event.detail.y);
