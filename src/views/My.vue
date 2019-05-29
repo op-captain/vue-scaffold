@@ -1,6 +1,7 @@
 <template>
   <div class="wrap">
     <h2>个人中心abc</h2>
+    <h3></h3>
     <p>Normal upload(File max size 1MB):</p>
     <div id="wrap" style="display:none">
       <cube-upload
@@ -95,16 +96,17 @@ export default {
         loadImageFileTypes: /^image\/(gif|jpeg|png|bmp|svg\+xml)$/, //图片格式
         acceptFileTypes: /(\.|\/)(gif|jpe?g|png|bmp)$/i, //文件格式
         maxFileSize: 999000,
-        // Enable image resizing, except for Android and Opera,
-        // which actually support image resizing, but fail to
-        // send Blob objects via XHR requests:
-        disableImageResize: /Android(?!.*Chrome)|Opera|/.test(
-          window.navigator.userAgent
-        ),
+        // // Enable image resizing, except for Android and Opera,
+        // // which actually support image resizing, but fail to
+        // // send Blob objects via XHR requests:
+        // disableImageResize: /Android(?!.*Chrome)|Opera|/.test(
+        //   window.navigator.userAgent
+        // ),
+        //disableExif true 和  previewCanvas false 同时配置，才能让移动端的图片方向正确
         disableExif: true, //避免移动端图片方向不正确，PC端 false和 true都可以
-        previewCanvas: false, //预览图使用 img 而不是 canvas
-        previewMaxWidth: 100, //预览图的大小
-        previewMaxHeight: 100,
+        previewCanvas: false, //预览图使用 img 而不是 canvas。
+        previewMaxWidth: 200, //预览图的大小
+        previewMaxHeight: 200,
         // previewCrop: true, //统一正方形预览图，但是移动端会图片方向会不正确
         beforeSend: function(xhr, data) {
           // xhr.setRequestHeader("Access-Control-Request-Headers", "accept, origin, authorization");
@@ -123,6 +125,24 @@ export default {
       })
       .on("fileuploadprocessalways", function(e, data) {
         console.log(data);
+
+        function toBlob(file, callback) {
+          //定义一个文件阅读器
+          var reader = new FileReader();
+
+          //文件装载后将其显示在图片预览里
+          reader.onload = function() {
+            // $("#img_preview").attr("src", this.result);
+            var bf = this.result;
+            var blob = new Blob([bf], { type: "text/plain" });
+
+            var urlBlob = URL.createObjectURL(blob);
+            callback && callback(urlBlob);
+          };
+
+          //装载文件
+          reader.readAsArrayBuffer(data.originalFiles[index]);
+        }
 
         var index = data.index,
           file = data.files[index],
@@ -143,16 +163,29 @@ export default {
               .prop("disabled", !!data.files.error);
           }
 
-          //设置裁剪图的数据
-          that.cropperUrl = URL.createObjectURL(file);
+          function callback(urlBlob) {
+            //设置裁剪图的数据
+            that.cropperUrl = urlBlob
 
-          that.$nextTick(() => {
-            //初始化裁剪插件
-            that.$refs.corpper.cropperCreate();
-          });
+            that.$nextTick(() => {
+              //初始化裁剪插件
+              that.$refs.corpper.cropperCreate();
+            });
+          }
 
-          //创建预览图
-          node.prepend("<br>").prepend(file.preview);
+//file.preview
+          function callback1(urlBlob){
+              //创建预览图
+              node.prepend("<br>").append($('<img/>')).find('img').attr({'src':urlBlob}).css("max-width","100px")
+          }
+
+          toBlob(data.originalFiles[index], callback);
+
+          toBlob(data.originalFiles[index], callback1);
+
+          
+
+          
         }
       })
       .on("fileuploadprogressall", function(e, data) {
