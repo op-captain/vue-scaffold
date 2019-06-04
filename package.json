@@ -7,7 +7,8 @@
     "local": "vue-cli-service serve --mode local",
     "test": "vue-cli-service serve --mode test",
     "prod": "vue-cli-service serve --mode production",
-    "build": "vue-cli-service build"
+    "build-production": "vue-cli-service build --mode production",
+    "build-test": "vue-cli-service build --mode test"
   },
   "dependencies": {
     "amfe-flexible": "^2.2.1",

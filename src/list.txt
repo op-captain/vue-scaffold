@@ -1,0 +1,70 @@
+f:\zhujun\project\people-app\src
+├─App.vue
+├─main.js
+├─views
+|   ├─Detail.vue
+|   ├─Home.vue
+|   ├─List.vue
+|   ├─List_back.vue
+|   ├─Login.vue
+|   └My.vue
+├─utils
+|   ├─localStorage.js
+|   ├─utils.js
+|   ├─validatorRules.js
+|   ├─lib
+|   |  ├─exif.js
+|   |  ├─exif.min.js
+|   |  ├─iscroll-probe.js
+|   |  ├─jQuery-File-Upload
+|   |  |         ├─canvas-to-blob.min.js
+|   |  |         ├─jquery.fileupload-audio.js
+|   |  |         ├─jquery.fileupload-image.js
+|   |  |         ├─jquery.fileupload-process.js
+|   |  |         ├─jquery.fileupload-validate.js
+|   |  |         ├─jquery.fileupload-video.js
+|   |  |         ├─jquery.fileupload.js
+|   |  |         ├─jquery.iframe-transport.js
+|   |  |         ├─load-image.all.min.js
+|   |  |         ├─vendor
+|   |  |         |   └jquery.ui.widget.js
+├─store
+|   └index.js
+├─router
+|   ├─detail.js
+|   ├─home.js
+|   ├─index.js
+|   ├─list.js
+|   ├─login.js
+|   └my.js
+├─mixins
+|   └pageList.js
+├─filter
+|   └index.js
+├─directive
+|     └index.js
+├─components
+|     ├─HelloWorld.vue
+|     ├─global
+|     |   ├─BottomTabNavigator.vue
+|     |   ├─Cropper.vue
+|     |   ├─cubeUi.js
+|     |   ├─index.js
+|     |   ├─NavTop.vue
+|     |   ├─PreviewImage.vue
+|     |   └ScrollView_back.vue
+├─assets
+|   ├─common.less
+|   ├─cropper.css
+|   ├─variables.less
+|   ├─images
+|   |   ├─logo.png
+|   |   ├─test1.jpg
+|   |   ├─test2.jpg
+|   |   ├─test3.jpg
+|   |   ├─test4.jpg
+|   |   ├─test5.jpg
+|   |   └test6.jpg
+├─api
+|  ├─index.js
+|  └service.js

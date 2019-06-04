@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div id="wrap">
     <cube-validator
       ref="username"
       :model="username"
@@ -108,6 +108,9 @@ export default {
 </script>
 
 <style lang="less" scoped>
+#wrap{
+  margin-top: 60px;
+}
 .cube-validator_warn {
   input {
     border: solid 1px red;
