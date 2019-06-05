@@ -2,17 +2,9 @@ import Vue from 'vue'
 import Vuex from 'vuex'
 import api from '../api/index'
 import storage from '../utils/localStorage'
+import * as mutationType from './mutation-types'
 
 Vue.use(Vuex)
-
-//对应 mutations actions里面的方法
-const types = {
-  Login: "Login",
-  TabBarBottomDisplay: "TabBarBottomDisplay",
-  TabBarBottomSelectedLabel: "TabBarBottomSelectedLabel",
-  navTopTitle: "navTopTitle",
-  navTopBackDisplay: "navTopBackDisplay"
-}
 
 export default new Vuex.Store({
   state: {
@@ -48,7 +40,7 @@ export default new Vuex.Store({
     }
   },
   mutations: {
-    [types.Login]: (state, data) => {
+    [mutationType.LOGIN]: (state, data) => {
       //清除原token
       storage.setLocalStorage("token")
       //设置token
@@ -56,26 +48,26 @@ export default new Vuex.Store({
       state.auth.login = data.token ? true : false
 
     },
-    [types.TabBarBottomDisplay]: (state, bool) => {
+    [mutationType.TAB_BAR_BOTTOM_DISPLAY]: (state, bool) => {
       state.tabBarBottom.isShow = bool
     },
-    [types.TabBarBottomSelectedLabel]: (state, name) => {
+    [mutationType.TAB_BAR_BOTTOM_SELECTED_LABEL]: (state, name) => {
       state.tabBarBottom.selectedLabel = name;
     },
-    [types.navTopTitle]: (state, title) => {
+    [mutationType.NAV_TOP_TITLE]: (state, title) => {
       state.navTop.title = title
     },
-    [types.navTopBackDisplay]: (state, bool) => {
+    [mutationType.NAV_TOP_BACK_DISPLAY]: (state, bool) => {
       state.navTop.back = bool
     },
   },
   actions: {
-    [types.Login]: async ({ commit }, param) => {
+    [mutationType.LOGIN]: async ({ commit }, param) => {
 
       let res = await api.login(param);
 
       if (res && res.data) {
-        commit(types.Login, res.data.data)
+        commit(mutationType.LOGIN, res.data.data)
       }
 
       return res

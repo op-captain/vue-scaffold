@@ -32,6 +32,7 @@ import { mapActions } from "vuex";
 import _ from "lodash";
 import utils from "../utils/utils";
 import { Validator } from "cube-ui";
+import {LOGIN} from '../store/mutation-types'
 
 //对应表单的数据 和验证规则
 let inputs = {
@@ -74,7 +75,7 @@ export default {
     };
   },
   methods: {
-    ...mapActions(["Login"]),
+    ...mapActions([LOGIN]),
     //验证全部表单
     submitValidator() {
       let validatorAllResultPromise = Object.keys(inputs).map(item =>
@@ -90,7 +91,7 @@ export default {
     sendLogin() {
       this.submitValidator().then(validator => {
         if (validator) {
-          this.Login({ username: "zz", password: "123" }).then(res => {
+          this[LOGIN]({ username: "zz", password: "123" }).then(res => {
             //登录成功后，跳转到之前的页面
             let redirect = decodeURIComponent(
               this.$route.query.redirect || "/"

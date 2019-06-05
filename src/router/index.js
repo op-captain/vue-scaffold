@@ -87,10 +87,10 @@ function tabBarBottom(to, from, next) {
     if (to.path === '/' || to.path === '/list' || to.path === '/my') {
         let label = _.find(VueRouter.app.$options.store.state.tabBarBottom.tabs, { path: to.path }).label
         
-        VueRouter.app.$options.store.commit('TabBarBottomDisplay', true)
-        VueRouter.app.$options.store.commit('TabBarBottomSelectedLabel', label)
+        VueRouter.app.$options.store.commit('TAB_BAR_BOTTOM_DISPLAY', true)
+        VueRouter.app.$options.store.commit('TAB_BAR_BOTTOM_SELECTED_LABEL', label)
     } else {
-        VueRouter.app.$options.store.commit('TabBarBottomDisplay', false)
+        VueRouter.app.$options.store.commit('TAB_BAR_BOTTOM_DISPLAY', false)
     }
 }
 
@@ -101,8 +101,8 @@ function navTop(to, from, next) {
     if(to.path === '/' ){
         backIs = false
     }
-    VueRouter.app.$options.store.commit('navTopBackDisplay', backIs)
-    VueRouter.app.$options.store.commit('navTopTitle', to.meta.title)
+    VueRouter.app.$options.store.commit('NAV_TOP_BACK_DISPLAY', backIs)
+    VueRouter.app.$options.store.commit('NAV_TOP_TITLE', to.meta.title)
 
 }
 
