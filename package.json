@@ -20,7 +20,7 @@
     "cube-ui": "~1.12.15",
     "jquery": "^3.4.1",
     "jquery-cropper": "^1.0.0",
-    "lodash": "^4.17.11",
+    "lodash": "^4.17.19",
     "swiper": "^4.5.0",
     "vue": "^2.6.10",
     "vue-router": "^3.0.3",
